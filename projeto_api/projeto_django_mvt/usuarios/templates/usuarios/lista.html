@@ -1,0 +1,19 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Lista de Usuários{% endblock %}
+
+{% block content %}
+<h1>Usuários cadastrados</h1>
+
+<ul>
+    {% for usuario in usuarios %}
+        <li>{{ usuario.username }} ({{ usuario.email|default:"Sem email" }})</li>
+    {% empty %}
+        <li>Nenhum usuário cadastrado.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'register' %}" class="btn" style="margin-top: 20px;">
+    Adicionar Usuário via API
+</a>
+{% endblock %}
