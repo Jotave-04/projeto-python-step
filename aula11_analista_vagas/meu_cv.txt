@@ -1,0 +1,43 @@
+NOME: João Victor Passos Canavez
+EMAIL: jvcanevez@gmail.com
+LINKEDIN: linkedin.com/in/joaovictorcanavez/
+GITHUB: github.com/jotave-04
+
+RESUMO PROFISSIONAL:
+Desenvolvedor Backend e Estudante de Engenharia de Software com sólida base em desenvolvimento de sistemas, arquitetura MVC e manipulação de bancos de dados. Experiência prática na aplicação de Python para automação e soluções corporativas, além de atuação na área de tecnologia e suporte administrativo em ambiente multinacional. Familiaridade com versionamento de código e desenvolvimento de projetos de impacto social e rastreamento logístico.
+
+EXPERIÊNCIA PROFISSIONAL:
+
+TechnipFMC (Março de 2026 – Presente)
+Cargo: Jovem Aprendiz — Assistente Administrativo em Soluções de TI (LTC Vessel Execution)
+- Atuação no suporte e desenvolvimento de soluções de TI voltadas para a execução e logística de embarcações.
+- Aplicação prática de Python e ferramentas de automação para otimização de processos internos e gestão de dados do departamento.
+- Colaboração em ambiente corporativo global, lidando com documentação técnica e fluxos de trabalho dinâmicos.
+
+Esporte Mais Inclusivo - Projeto Social (Dezembro de 2025 – Presente)
+Cargo: Coordenador de TI e Marketing Digital (Voluntariado)
+- Responsável pela infraestrutura digital do projeto, incluindo a criação e gerenciamento de formulários automatizados de inscrição e termos de voluntariado.
+- Coordenação e desenvolvimento de materiais de identidade visual e campanhas de marketing digital para engajamento do projeto.
+
+PROJETOS EM DESTAQUE:
+- LogisTech: Desenvolvimento de uma solução para rastreamento de cargas utilizando Python, integrado com PostgreSQL e Supabase para modelagem, persistência e gerenciamento de dados em tempo real.
+
+HABILIDADES TÉCNICAS:
+- Linguagens de Programação: Python, C, Java
+- Bancos de Dados: PostgreSQL, Supabase
+- Arquitetura e Ferramentas: Arquitetura MVC, REST APIs
+- DevOps & Controle de Versão: Git, GitHub, VS Code
+- Sistemas Operacionais & Prompt: Ferramentas de Linha de Comando (CMD/Terminal)
+
+FORMAÇÃO ACADÊMICA:
+- Bacharelado em Engenharia de Software — Universidade Veiga de Almeida (UVA) | Em andamento (2º período)
+- Qualificação Profissional Assistente Administrativo — Firjan SENAI | Março de 2026 – Presente (Integrado à aprendizagem)
+
+CERTIFICAÇÕES:
+- Certificação Profissional em Programação Python — IT Step Computer Academy (Iniciado em Setembro de 2025)
+- PCAP — Certified Associate in Python Programming
+- Cisco NetAcad — Python Essentials 2
+
+IDIOMAS:
+- Português: Nativo
+- Inglês: Avançado / Fluente (Intercâmbio acadêmico e residencial de 6 meses na EF Boston, EUA - 2025)
