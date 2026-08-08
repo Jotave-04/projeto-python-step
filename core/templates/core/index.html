@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão de Eventos</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #2b1420;
+    color: #f0e0d8;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 600px; margin: 0 auto; }
+  header { margin-bottom: 1.5rem; }
+  header h1 {
+    color: #d4af6a;
+    font-weight: 500;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+  }
+  header p { color: #cbb3a3; font-size: 13px; margin-top: 4px; }
+
+  nav {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #6b3450;
+    flex-wrap: wrap;
+  }
+  nav button {
+    background: transparent;
+    border: none;
+    color: #cbb3a3;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  nav button.active {
+    color: #d4af6a;
+    border-bottom: 2px solid #d4af6a;
+  }
+  nav button#nav-admin { display: none; }
+  nav button#nav-logout { display: none; margin-left: auto; color: #c98a8a; }
+
+  section { display: none; }
+  section.active { display: block; }
+
+  .card {
+    background: #4a1f38;
+    border: 1px solid #6b3450;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 12px;
+  }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .card-title { color: #f0e0d8; font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+  .card-sub { color: #cbb3a3; font-size: 12px; }
+  .badge {
+    background: #d4af6a;
+    color: #3d1a2e;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+  }
+  .price { color: #d4af6a; font-size: 14px; font-weight: 500; }
+
+  button, .btn {
+    background: transparent;
+    border: 1px solid #d4af6a;
+    color: #d4af6a;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  button:hover, .btn:hover { background: rgba(212, 175, 106, 0.12); }
+  button.primary { background: #d4af6a; color: #3d1a2e; font-weight: 500; }
+  button.primary:hover { background: #c49f5a; }
+
+  form { display: flex; flex-direction: column; gap: 12px; max-width: 400px; }
+  label { color: #cbb3a3; font-size: 13px; margin-bottom: -6px; }
+  input, textarea, select {
+    background: #3d1a2e;
+    border: 1px solid #6b3450;
+    color: #f0e0d8;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #d4af6a;
+  }
+
+  #status-msg {
+    display: none;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 1rem;
+  }
+  #status-msg.ok { display: block; background: rgba(99, 153, 34, 0.2); color: #a9d16a; border: 1px solid #4a7a1a; }
+  #status-msg.erro { display: block; background: rgba(201, 138, 138, 0.15); color: #e29a9a; border: 1px solid #8a3a3a; }
+
+  .empty { color: #cbb3a3; font-size: 13px; padding: 1rem 0; }
+  .user-tag { color: #cbb3a3; font-size: 12px; margin-bottom: 1rem; }
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(20, 8, 15, 0.75);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #4a1f38;
+    border: 1px solid #d4af6a;
+    border-radius: 8px;
+    padding: 1.5rem;
+    max-width: 340px;
+    text-align: center;
+  }
+  .modal-box h3 {
+    color: #d4af6a;
+    font-weight: 500;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .modal-box p {
+    color: #f0e0d8;
+    font-size: 14px;
+    margin-bottom: 1.25rem;
+  }
+  .modal-box form {
+    max-width: 100%;
+    text-align: left;
+    margin-bottom: 0;
+  }
+  .modal-box .modal-botoes {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .modal-box .modal-botoes button {
+    flex: 1;
+    width: auto;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Gestão de Eventos</h1>
+    <p>Sistema de eventos e inscrições</p>
+  </header>
+
+  <div id="status-msg"></div>
+
+  <nav>
+    <button class="nav-btn active" data-tab="eventos">Eventos</button>
+    <button class="nav-btn" data-tab="login" id="nav-login">Login</button>
+    <button class="nav-btn" data-tab="registrar" id="nav-registrar">Registrar</button>
+    <button class="nav-btn" data-tab="novo-evento" id="nav-admin">Novo evento</button>
+    <button id="nav-logout">Sair</button>
+  </nav>
+
+  <p class="user-tag" id="user-tag" style="display:none;"></p>
+
+  <section id="tab-eventos" class="active">
+    <div id="lista-eventos"></div>
+  </section>
+
+  <section id="tab-login">
+    <form id="form-login">
+      <label>Email</label>
+      <input type="email" id="login-email" required placeholder="seu@email.com">
+      <label>Senha</label>
+      <input type="password" id="login-senha" required placeholder="Sua senha">
+      <button type="submit" class="primary">Entrar</button>
+    </form>
+  </section>
+
+  <section id="tab-registrar">
+    <form id="form-registrar">
+      <label>Nome</label>
+      <input type="text" id="reg-nome" required placeholder="Seu nome">
+      <label>Email</label>
+      <input type="email" id="reg-email" required placeholder="seu@email.com">
+      <label>Senha</label>
+      <input type="password" id="reg-senha" required placeholder="Mínimo 6 caracteres">
+      <button type="submit" class="primary">Criar conta</button>
+    </form>
+  </section>
+
+  <section id="tab-novo-evento">
+    <form id="form-evento">
+      <label>Nome do evento</label>
+      <input type="text" id="ev-nome" required placeholder="Ex: Festa Junina">
+      <label>Descrição</label>
+      <textarea id="ev-descricao" rows="2" placeholder="Opcional"></textarea>
+      <label>Data e hora</label>
+      <input type="datetime-local" id="ev-data" required>
+      <label>Local</label>
+      <input type="text" id="ev-local" required placeholder="Ex: Salão A">
+      <label>Capacidade</label>
+      <input type="number" id="ev-capacidade" required placeholder="Ex: 100">
+      <label>Valor (R$)</label>
+      <input type="number" step="0.01" id="ev-valor" required placeholder="Ex: 50.00">
+      <button type="submit" class="primary">Criar evento</button>
+    </form>
+  </section>
+</div>
+
+<div class="modal-overlay" id="modal-inscricao">
+  <div class="modal-box">
+    <h3 id="modal-titulo">Inscrever-se no evento</h3>
+    <form id="form-inscricao">
+      <label>Nome</label>
+      <input type="text" id="insc-nome" required placeholder="Seu nome">
+      <label>Email</label>
+      <input type="email" id="insc-email" required placeholder="seu@email.com">
+      <label>Telefone</label>
+      <input type="text" id="insc-telefone" placeholder="Opcional">
+      <div class="modal-botoes">
+        <button type="button" onclick="fecharModal()">Cancelar</button>
+        <button type="submit" class="primary">Confirmar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirmacao">
+  <div class="modal-box">
+    <h3 id="modal-confirmacao-titulo">Inscrição confirmada!</h3>
+    <p id="modal-confirmacao-texto">Você foi inscrito no evento com sucesso.</p>
+    <button class="primary" onclick="fecharModalConfirmacao()">Fechar</button>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin + '/api';
+let token = null;
+let usuario = null;
+
+function showStatus(msg, tipo) {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = tipo;
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+function atualizarSessao() {
+  const logado = !!token;
+  document.getElementById('nav-login').style.display = logado ? 'none' : 'inline-block';
+  document.getElementById('nav-registrar').style.display = logado ? 'none' : 'inline-block';
+  document.getElementById('nav-logout').style.display = logado ? 'inline-block' : 'none';
+  document.getElementById('nav-admin').style.display = (logado && usuario && usuario.role === 'admin') ? 'inline-block' : 'none';
+
+  const tag = document.getElementById('user-tag');
+  if (logado && usuario) {
+    tag.style.display = 'block';
+    tag.textContent = 'Logado como ' + usuario.nome + ' (' + usuario.role + ')';
+  } else {
+    tag.style.display = 'none';
+  }
+}
+
+async function carregarEventos() {
+  const resp = await fetch(API + '/eventos');
+  const eventos = await resp.json();
+  const container = document.getElementById('lista-eventos');
+
+  if (eventos.length === 0) {
+    container.innerHTML = '<p class="empty">Nenhum evento cadastrado ainda.</p>';
+    return;
+  }
+
+  container.innerHTML = eventos.map(ev => {
+    const data = new Date(ev.data);
+    const dataFormatada = data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    return `
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <div class="card-title">${ev.nome}</div>
+            <div class="card-sub">${dataFormatada} · ${ev.local}</div>
+          </div>
+          <span class="badge">${ev.status}</span>
+        </div>
+        <div class="card-bottom">
+          <span class="price">R$ ${ev.valor}</span>
+          <button onclick="inscrever(${ev.id})">Inscrever-se</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+let eventoAtualId = null;
+
+function fecharModal() {
+  document.getElementById('modal-inscricao').classList.remove('show');
+}
+
+function abrirModalConfirmacao(titulo, texto) {
+  document.getElementById('modal-confirmacao-titulo').textContent = titulo;
+  document.getElementById('modal-confirmacao-texto').textContent = texto;
+  document.getElementById('modal-confirmacao').classList.add('show');
+}
+
+function fecharModalConfirmacao() {
+  document.getElementById('modal-confirmacao').classList.remove('show');
+}
+
+function inscrever(eventoId) {
+  if (!token) {
+    showStatus('Faça login para se inscrever em um evento.', 'erro');
+    switchTab('login');
+    return;
+  }
+  eventoAtualId = eventoId;
+  document.getElementById('insc-nome').value = usuario.nome;
+  document.getElementById('insc-email').value = usuario.email;
+  document.getElementById('insc-telefone').value = '';
+  document.getElementById('modal-inscricao').classList.add('show');
+}
+
+document.getElementById('form-inscricao').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('insc-nome').value;
+  const email = document.getElementById('insc-email').value;
+  const telefone = document.getElementById('insc-telefone').value;
+
+  const resp = await fetch(API + '/eventos/' + eventoAtualId + '/inscricoes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ nome: nome, email: email, telefone: telefone })
+  });
+
+  fecharModal();
+
+  if (resp.ok) {
+    abrirModalConfirmacao('Inscrição confirmada!', 'Você foi inscrito com sucesso, ' + nome + '.');
+  } else {
+    const erro = await resp.json();
+    abrirModalConfirmacao('Não foi possível inscrever', erro.erro || 'Tente novamente em instantes.');
+  }
+});
+
+document.getElementById('form-login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const senha = document.getElementById('login-senha').value;
+
+  const resp = await fetch(API + '/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, senha })
+  });
+  const dados = await resp.json();
+
+  if (resp.ok) {
+    token = dados.token;
+    usuario = dados.usuario;
+    atualizarSessao();
+    showStatus('Login realizado com sucesso!', 'ok');
+    switchTab('eventos');
+    e.target.reset();
+  } else {
+    showStatus(dados.erro || 'Erro ao fazer login.', 'erro');
+  }
+});
+
+document.getElementById('form-registrar').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const nome = document.getElementById('reg-nome').value;
+  const email = document.getElementById('reg-email').value;
+  const senha = document.getElementById('reg-senha').value;
+
+  const resp = await fetch(API + '/registrar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome, email, senha })
+  });
+  const dados = await resp.json();
+
+  if (resp.ok) {
+    token = dados.token;
+    usuario = dados.usuario;
+    atualizarSessao();
+    showStatus('Conta criada com sucesso!', 'ok');
+    switchTab('eventos');
+    e.target.reset();
+  } else {
+    showStatus(dados.erro || 'Erro ao registrar.', 'erro');
+  }
+});
+
+document.getElementById('form-evento').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const body = {
+    nome: document.getElementById('ev-nome').value,
+    descricao: document.getElementById('ev-descricao').value,
+    data: document.getElementById('ev-data').value,
+    local: document.getElementById('ev-local').value,
+    capacidade: parseInt(document.getElementById('ev-capacidade').value),
+    valor: parseFloat(document.getElementById('ev-valor').value)
+  };
+
+  const resp = await fetch(API + '/eventos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify(body)
+  });
+  const dados = await resp.json();
+
+  if (resp.ok) {
+    showStatus('Evento criado com sucesso!', 'ok');
+    e.target.reset();
+    switchTab('eventos');
+    carregarEventos();
+  } else {
+    showStatus(dados.erro || 'Erro ao criar evento.', 'erro');
+  }
+});
+
+document.getElementById('nav-logout').addEventListener('click', () => {
+  token = null;
+  usuario = null;
+  atualizarSessao();
+  showStatus('Sessão encerrada.', 'ok');
+  switchTab('eventos');
+});
+
+carregarEventos();
+atualizarSessao();
+</script>
+
+</body>
+</html>
