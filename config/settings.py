@@ -16,6 +16,7 @@ ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.auth",
+    "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
     "core",
@@ -28,9 +29,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
-# ──────────────────────────────────────────────
-# CONFIGURAÇÃO DO BANCO — SUPABASE (PostgreSQL)
-# ──────────────────────────────────────────────
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
@@ -76,3 +74,6 @@ TEMPLATES = [
         },
     },
 ]
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "core" / "static"]

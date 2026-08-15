@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -60,6 +61,12 @@
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
   .card-title { color: #f0e0d8; font-weight: 500; font-size: 15px; margin-bottom: 4px; }
   .card-sub { color: #cbb3a3; font-size: 12px; }
+  .card-desc {
+  color: #cbb3a3;
+  font-size: 13px;
+  margin-top: 8px;
+  line-height: 1.4;
+}
   .badge {
     background: #d4af6a;
     color: #3d1a2e;
@@ -75,6 +82,24 @@
     align-items: center;
     margin-top: 12px;
   }
+  .card-admin-actions {
+  display: none;
+  gap: 8px;
+  margin-top: 10px;
+}
+.card-admin-actions.show { display: flex; }
+.card-admin-actions button {
+  flex: 1;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+.btn-excluir {
+  border-color: #c98a8a;
+  color: #e29a9a;
+}
+.btn-excluir:hover {
+  background: rgba(201, 138, 138, 0.12);
+}
   .price { color: #d4af6a; font-size: 14px; font-weight: 500; }
 
   button, .btn {
@@ -162,6 +187,70 @@
     flex: 1;
     width: auto;
   }
+  .pagamento-opcoes {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0;
+}
+.pagamento-opcoes label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 1px solid #6b3450;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #cbb3a3;
+  margin-bottom: 0;
+}
+.pagamento-opcoes input[type="radio"] {
+  display: none;
+}
+.pagamento-opcoes label.selecionado {
+  border-color: #d4af6a;
+  color: #d4af6a;
+  background: rgba(212, 175, 106, 0.08);
+}
+.pagamento-opcoes .icone {
+  font-size: 20px;
+}
+
+.cartao-campos, .pix-area {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+.cartao-campos.show, .pix-area.show {
+  display: flex;
+}
+.pix-qrcode-placeholder {
+  width: 180px;
+  height: 180px;
+  margin: 8px auto;
+  background: #3d1a2e;
+  border: 2px dashed #6b3450;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b3450;
+  font-size: 12px;
+  text-align: center;
+  padding: 8px;
+}
+.pix-chave {
+  background: #3d1a2e;
+  border: 1px solid #6b3450;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #cbb3a3;
+  text-align: center;
+  word-break: break-all;
+}
 </style>
 </head>
 <body>
@@ -241,9 +330,50 @@
       <input type="text" id="insc-telefone" placeholder="Opcional">
       <div class="modal-botoes">
         <button type="button" onclick="fecharModal()">Cancelar</button>
-        <button type="submit" class="primary">Confirmar</button>
+        <button type="submit" class="primary">Continuar</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-pagamento">
+  <div class="modal-box">
+    <h3>Forma de pagamento</h3>
+    <p id="pagamento-valor" style="color:#d4af6a; font-size:16px; margin-bottom:12px;"></p>
+
+    <div class="pagamento-opcoes">
+      <label id="label-credito" onclick="selecionarPagamento('credito')">
+        <span class="icone">💳</span>
+        Crédito
+      </label>
+      <label id="label-debito" onclick="selecionarPagamento('debito')">
+        <span class="icone">💳</span>
+        Débito
+      </label>
+      <label id="label-pix" onclick="selecionarPagamento('pix')">
+        <span class="icone">🔳</span>
+        Pix
+      </label>
+    </div>
+
+    <div class="cartao-campos" id="cartao-campos">
+      <input type="text" id="cartao-numero" placeholder="Número do cartão (simulação)" maxlength="19">
+      <input type="text" id="cartao-nome" placeholder="Nome impresso no cartão">
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="cartao-validade" placeholder="MM/AA" style="flex:1;">
+        <input type="text" id="cartao-cvv" placeholder="CVV" style="flex:1;" maxlength="4">
+      </div>
+    </div>
+
+    <div class="pix-area" id="pix-area">
+      <img src="{% static 'core/img/Pix.png' %}" alt="QR Code Pix" class="pix-qrcode-placeholder" style="object-fit: contain;">
+      <p class="pix-chave">Chave simulada: evento-pix-simulacao@teste.com</p>
+    </div>
+
+    <div class="modal-botoes" style="margin-top: 12px;">
+      <button type="button" onclick="fecharModalPagamento()">Cancelar</button>
+      <button type="button" class="primary" id="btn-confirmar-pagamento" onclick="confirmarPagamento()" disabled>Confirmar pagamento</button>
+    </div>
   </div>
 </div>
 
@@ -254,11 +384,41 @@
     <button class="primary" onclick="fecharModalConfirmacao()">Fechar</button>
   </div>
 </div>
-
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal-box">
+    <h3>Editar evento</h3>
+    <form id="form-editar">
+      <label>Nome do evento</label>
+      <input type="text" id="edit-nome" required>
+      <label>Descrição</label>
+      <textarea id="edit-descricao" rows="2"></textarea>
+      <label>Data e hora</label>
+      <input type="datetime-local" id="edit-data" required>
+      <label>Local</label>
+      <input type="text" id="edit-local" required>
+      <label>Capacidade</label>
+      <input type="number" id="edit-capacidade" required>
+      <label>Valor (R$)</label>
+      <input type="number" step="0.01" id="edit-valor" required>
+      <label>Status</label>
+      <select id="edit-status">
+        <option value="planejado">Planejado</option>
+        <option value="confirmado">Confirmado</option>
+        <option value="realizado">Realizado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+      <div class="modal-botoes">
+        <button type="button" onclick="fecharModalEditar()">Cancelar</button>
+        <button type="submit" class="primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
 <script>
 const API = window.location.origin + '/api';
 let token = null;
 let usuario = null;
+let eventosCache = [];
 
 function showStatus(msg, tipo) {
   const el = document.getElementById('status-msg');
@@ -292,11 +452,14 @@ function atualizarSessao() {
   } else {
     tag.style.display = 'none';
   }
+
+  carregarEventos();
 }
 
 async function carregarEventos() {
   const resp = await fetch(API + '/eventos');
   const eventos = await resp.json();
+  eventosCache = eventos;
   const container = document.getElementById('lista-eventos');
 
   if (eventos.length === 0) {
@@ -304,9 +467,20 @@ async function carregarEventos() {
     return;
   }
 
+  const isAdmin = usuario && usuario.role === 'admin';
+
   container.innerHTML = eventos.map(ev => {
     const data = new Date(ev.data);
     const dataFormatada = data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+    const descricaoHtml = ev.descricao
+      ? `<div class="card-desc">${ev.descricao}</div>`
+      : '';
+    const adminActions = isAdmin
+      ? `<div class="card-admin-actions show">
+           <button onclick='abrirModalEditar(${JSON.stringify(ev)})'>Editar</button>
+           <button class="btn-excluir" onclick="excluirEvento(${ev.id})">Excluir</button>
+         </div>`
+      : '';
     return `
       <div class="card">
         <div class="card-top">
@@ -316,16 +490,90 @@ async function carregarEventos() {
           </div>
           <span class="badge">${ev.status}</span>
         </div>
+        ${descricaoHtml}
         <div class="card-bottom">
           <span class="price">R$ ${ev.valor}</span>
           <button onclick="inscrever(${ev.id})">Inscrever-se</button>
         </div>
+        ${adminActions}
       </div>
     `;
   }).join('');
 }
 
+let eventoEditandoId = null;
+
+function abrirModalEditar(ev) {
+  eventoEditandoId = ev.id;
+  document.getElementById('edit-nome').value = ev.nome;
+  document.getElementById('edit-descricao').value = ev.descricao || '';
+  document.getElementById('edit-local').value = ev.local;
+  document.getElementById('edit-capacidade').value = ev.capacidade;
+  document.getElementById('edit-valor').value = ev.valor;
+  document.getElementById('edit-status').value = ev.status;
+
+  const dataObj = new Date(ev.data);
+  const offset = dataObj.getTimezoneOffset();
+  const dataLocal = new Date(dataObj.getTime() - offset * 60000);
+  document.getElementById('edit-data').value = dataLocal.toISOString().slice(0, 16);
+
+  document.getElementById('modal-editar').classList.add('show');
+}
+
+function fecharModalEditar() {
+  document.getElementById('modal-editar').classList.remove('show');
+}
+
+document.getElementById('form-editar').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const body = {
+    nome: document.getElementById('edit-nome').value,
+    descricao: document.getElementById('edit-descricao').value,
+    data: document.getElementById('edit-data').value,
+    local: document.getElementById('edit-local').value,
+    capacidade: parseInt(document.getElementById('edit-capacidade').value),
+    valor: parseFloat(document.getElementById('edit-valor').value),
+    status: document.getElementById('edit-status').value
+  };
+
+  const resp = await fetch(API + '/eventos/' + eventoEditandoId, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify(body)
+  });
+
+  fecharModalEditar();
+
+  if (resp.ok) {
+    showStatus('Evento atualizado com sucesso!', 'ok');
+    carregarEventos();
+  } else {
+    const erro = await resp.json();
+    showStatus(erro.erro || 'Erro ao atualizar evento.', 'erro');
+  }
+});
+
+async function excluirEvento(eventoId) {
+  if (!confirm('Tem certeza que deseja excluir este evento? Essa ação não pode ser desfeita.')) {
+    return;
+  }
+
+  const resp = await fetch(API + '/eventos/' + eventoId, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+
+  if (resp.ok || resp.status === 204) {
+    showStatus('Evento excluído com sucesso!', 'ok');
+    carregarEventos();
+  } else {
+    showStatus('Erro ao excluir evento.', 'erro');
+  }
+}
+
 let eventoAtualId = null;
+let dadosInscricaoPendente = null;
+let formaPagamentoSelecionada = null;
 
 function fecharModal() {
   document.getElementById('modal-inscricao').classList.remove('show');
@@ -356,25 +604,65 @@ function inscrever(eventoId) {
 
 document.getElementById('form-inscricao').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const nome = document.getElementById('insc-nome').value;
-  const email = document.getElementById('insc-email').value;
-  const telefone = document.getElementById('insc-telefone').value;
+  dadosInscricaoPendente = {
+    nome: document.getElementById('insc-nome').value,
+    email: document.getElementById('insc-email').value,
+    telefone: document.getElementById('insc-telefone').value
+  };
+  document.getElementById('modal-inscricao').classList.remove('show');
+  abrirModalPagamento();
+});
+
+function abrirModalPagamento() {
+  const evento = eventosCache.find(e => e.id === eventoAtualId);
+  document.getElementById('pagamento-valor').textContent = evento ? ('Valor: R$ ' + evento.valor) : '';
+
+  formaPagamentoSelecionada = null;
+  document.querySelectorAll('.pagamento-opcoes label').forEach(l => l.classList.remove('selecionado'));
+  document.getElementById('cartao-campos').classList.remove('show');
+  document.getElementById('pix-area').classList.remove('show');
+  document.getElementById('btn-confirmar-pagamento').disabled = true;
+
+  document.getElementById('modal-pagamento').classList.add('show');
+}
+
+function fecharModalPagamento() {
+  document.getElementById('modal-pagamento').classList.remove('show');
+}
+
+function selecionarPagamento(forma) {
+  formaPagamentoSelecionada = forma;
+
+  document.querySelectorAll('.pagamento-opcoes label').forEach(l => l.classList.remove('selecionado'));
+  document.getElementById('label-' + forma).classList.add('selecionado');
+
+  document.getElementById('cartao-campos').classList.toggle('show', forma === 'credito' || forma === 'debito');
+  document.getElementById('pix-area').classList.toggle('show', forma === 'pix');
+
+  document.getElementById('btn-confirmar-pagamento').disabled = false;
+}
+
+async function confirmarPagamento() {
+  document.getElementById('modal-pagamento').classList.remove('show');
 
   const resp = await fetch(API + '/eventos/' + eventoAtualId + '/inscricoes', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-    body: JSON.stringify({ nome: nome, email: email, telefone: telefone })
+    body: JSON.stringify(dadosInscricaoPendente)
   });
 
-  fecharModal();
-
   if (resp.ok) {
-    abrirModalConfirmacao('Inscrição confirmada!', 'Você foi inscrito com sucesso, ' + nome + '.');
+    const nomeFormaPagamento = { credito: 'Cartão de Crédito', debito: 'Cartão de Débito', pix: 'Pix' }[formaPagamentoSelecionada];
+    abrirModalConfirmacao(
+      'Pagamento aprovado!',
+      'Inscrição confirmada via ' + nomeFormaPagamento + '. Você receberá os detalhes por email.'
+    );
+    carregarEventos();
   } else {
     const erro = await resp.json();
-    abrirModalConfirmacao('Não foi possível inscrever', erro.erro || 'Tente novamente em instantes.');
+    abrirModalConfirmacao('Não foi possível concluir', erro.erro || 'Tente novamente em instantes.');
   }
-});
+}
 
 document.getElementById('form-login').addEventListener('submit', async (e) => {
   e.preventDefault();

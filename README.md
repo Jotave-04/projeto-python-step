@@ -9,3 +9,6 @@ DELETE |	/api/tarefas/{id}/ |	Excluir tarefa
 POST |	/api/tarefas/{id}/concluir/ |	Concluir tarefa
 POST |	/api/tarefas/{id}/reabrir/ |	Reabrir tarefa
 GET |	/api/tarefas/estatisticas/ |	Estatísticas do usuário
+
+ADMIN EDITAR E DELETAR
+ADICIONAR FORMA DE PAGAMENTO APÓS INSCRIÇÃO
