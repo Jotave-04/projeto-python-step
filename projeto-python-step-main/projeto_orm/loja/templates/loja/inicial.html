@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Página Inicial</title>
+  </head>
+  <body>
+    <h1>Produtos da Loja</h1>
+
+    <p>Bem-vindo, {{ user.username }}!</p>
+    <a href="{% url 'logout' %}">Sair</a>
+
+    <hr />
+
+    <table border="1" cellpadding="5">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Preço</th>
+          <th>Estoque</th>
+          <th>Categoria</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for produto in produtos %}
+          <tr>
+            <td>{{ produto.nome }}</td>
+            <td>R$ {{ produto.preco }}</td>
+            <td>{{ produto.estoque }}</td>
+            <td>{{ produto.categoria.nome }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">Nenhum produto cadastrado.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
+          
